@@ -5,11 +5,14 @@ import csv
 
 # import time
 
-def get_file(title):
+def get_file(title, open):
     root = tkinter.Tk()
     root.withdraw()
-    filename = filedialog.askopenfilename(parent=root, initialdir="/",
+    if open:
+        filename = filedialog.askopenfilename(parent=root, initialdir="/",
                                           title=title)
+    else:
+        filename = filedialog.asksaveasfile(filetypes = [("tsv file", ".tsv")],defaultextension=".tsv").name
     return filename
 
 
@@ -17,11 +20,11 @@ def convert():
     print("Please select the .tsv file containing the data to process.")
     filename = ""
     while len(filename) == 0:
-        filename = get_file('Please select your .tsv file to process')
+        filename = get_file('Please select your .tsv file to process', True)
     print("Please select the file for output.")
     out_filename = ""
     while len(out_filename) == 0:
-        out_filename = get_file('Please select the output file')
+        out_filename = get_file('Please select the output file', False)
     data = []
     # st = time.time()
     print("Reading file.")
