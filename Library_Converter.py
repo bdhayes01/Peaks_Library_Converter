@@ -8,16 +8,15 @@ import csv
 def get_file(title, existing):
     root = tkinter.Tk()
     root.withdraw()
-    if existing:    # This will find an already-existing file
+    if existing:  # This will find an already-existing file
         filename = filedialog.askopenfilename(parent=root, initialdir="/",
-                                          title=title)
-    else:   # This will create a new file or use an existing file.
-        filename = filedialog.asksaveasfile(filetypes = [("tsv file", ".tsv")],defaultextension=".tsv").name
+                                              title=title)
+    else:  # This will create a new file or use an existing file.
+        filename = filedialog.asksaveasfile(filetypes=[("tsv file", ".tsv")], defaultextension=".tsv").name
     return filename
 
 
 def convert():
-
     print("Please select the .tsv file containing the data to process.")
     filename = ""
     while len(filename) == 0:
@@ -31,7 +30,7 @@ def convert():
     data = []
     # st = time.time()
     print("Reading file: " + filename)
-    with open(filename) as file:    # This reads the file, taking the headers first,
+    with open(filename) as file:  # This reads the file, taking the headers first,
         # then adding every other line into the data array
         headers = file.readline().strip().split("\t")
         for line in file:
@@ -41,10 +40,10 @@ def convert():
     # st = time.time()
 
     # The below lines pull the indices of every important column
-    pcmz_index = headers.index("PrecursorMz")
+    precursor_mz_index = headers.index("PrecursorMz")
     prod_index = headers.index("ProductMz")
-    prec_ion_index = headers.index("PrecursorIonMobility")
-    prec_charge_index = headers.index("PrecursorCharge")
+    precursor_ion_index = headers.index("PrecursorIonMobility")
+    precursor_charge_index = headers.index("PrecursorCharge")
     frag_type_index = headers.index("FragmentType")
     frag_charge_index = headers.index("FragmentCharge")
     frag_series_index = headers.index("FragmentSeriesNumber")
@@ -52,20 +51,20 @@ def convert():
     rt_index = headers.index("NormalizedRetentionTime")
 
     print("Accessing data.")
-    obj_list = {}   # Create the dictionary
+    obj_list = {}  # Create the dictionary
     for line in data:
-        pcmz = line[pcmz_index]     # Find the precursor number, which is the dictionary key
-        obj = get_obj(obj_list, pcmz)   # Find the DataObject in the dictionary, if it exists
-        if not obj:                 # If the object doesn't exist:
-            obj = DataObject(pcmz)  # Make a new object.
-            obj_list[pcmz] = obj    # Add it to the dictionary.
+        precursor_mz = line[precursor_mz_index]  # Find the precursor number, which is the dictionary key
+        obj = get_obj(obj_list, precursor_mz)  # Find the DataObject in the dictionary, if it exists
+        if not obj:  # If the object doesn't exist:
+            obj = DataObject(precursor_mz)  # Make a new object.
+            obj_list[precursor_mz] = obj  # Add it to the dictionary.
 
         # Get the values below to find the peaks.
         product = line[prod_index]
         frag_type = line[frag_type_index]
         frag_charge = line[frag_charge_index]
         frag_series = line[frag_series_index]
-        precursor = line[prec_ion_index]
+        precursor = line[precursor_ion_index]
 
         if int(frag_charge) == 1:
             combined = f"{product}:{precursor}:{frag_type}{frag_series}"
@@ -77,7 +76,7 @@ def convert():
 
         # Add all below values (z, peptide sequence, retention time, etc.) into the DataObject.
         rt = float(line[rt_index])  # Find the retention time
-        obj.set_z(line[prec_charge_index])
+        obj.set_z(line[precursor_charge_index])
         obj.set_activation("high energy CID (y and b ions)")
         obj.set_sequence(line[pep_seq_index])
         obj.add_peaks_count()
@@ -98,10 +97,10 @@ def convert():
 
             # Write each unique Precursor m/z value to the file
             for obj in sorted(obj_list.keys()):
-                obj = obj_list[obj]     # Find object
+                obj = obj_list[obj]  # Find object
                 writer.writerow([obj.mz, obj.z, obj.rt, obj.activation, obj.sequence, obj.modifications,
-                                 obj.peaks_count, obj.peaks_list, obj.engine])      # Write row of data
-    except PermissionError:     # This means that the file is probably open somewhere, it could also be locked.
+                                 obj.peaks_count, obj.peaks_list, obj.engine])  # Write row of data
+    except PermissionError:  # This means that the file is probably open somewhere, it could also be locked.
         print("Is your file open in a different location? Please press a key and try again.")
         input()
     print("Done. Files written to: " + out_filename + "\nPlease press a key to exit, or close the window.")
@@ -141,10 +140,10 @@ class DataObject:
 
     def consolidate_peaks_list(self):
         peak_str = ""
-        for peak in sorted(self.peaks_list):    # Combine the peaks together into the needed format
+        for peak in sorted(self.peaks_list):  # Combine the peaks together into the needed format
             peak_str += peak
             peak_str += ";"
-        peak_str = peak_str[:-1]    # Take off the last semicolon
+        peak_str = peak_str[:-1]  # Take off the last semicolon
         self.peaks_list = peak_str
 
 
