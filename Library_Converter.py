@@ -27,7 +27,7 @@ def convert():
         out_filename = get_file('Please select the output file', False)
     data = []
     # st = time.time()
-    print("Reading file.")
+    print("Reading file: " + filename)
     with open(filename) as file:
         headers = file.readline().strip().split("\t")
         for line in file:
@@ -97,7 +97,7 @@ def convert():
         print("Is your file open in a different location? Please press a key and try again.")
         input()
     # print(f"Writing output takes: {time.time() - st} seconds")
-    print("Done. Please press a key to exit, or close the window.")
+    print("Done. Files written to: " + out_filename + "\nPlease press a key to exit, or close the window.")
     input()
     return
 
