@@ -98,8 +98,16 @@ def convert():
             # Write each unique Precursor m/z value to the file
             for obj in sorted(obj_list.keys()):
                 obj = obj_list[obj]  # Find object
-                writer.writerow([obj.mz, obj.z, obj.rt, obj.activation, obj.sequence, obj.modifications,
-                                 obj.peaks_count, obj.peaks_list, obj.engine])  # Write row of data
+                # TODO: Try writing each row as an fstream object
+
+                writer.writerow([f'{obj.mz}', f'{obj.z}', f'{obj.rt}',
+                                 f'{obj.activation}', f'{obj.sequence}',
+                                 f'{obj.modifications}', f'{obj.peaks_count}',
+                                 f'{obj.peaks_list}', f'{obj.engine}'])
+                # writer.writerow([f'"{obj.mz}"\t"{obj.z}"\t"{obj.rt}"\t"{obj.activation}"\t"{obj.sequence}"\t'
+                #                  f'"{obj.modifications}"\t"{obj.peaks_count}"\t"{obj.peaks_list}"\t"{obj.engine}"'])
+                # writer.writerow([obj.mz, obj.z, obj.rt, obj.activation, obj.sequence, obj.modifications,
+                #                  obj.peaks_count, obj.peaks_list, obj.engine])  # Write row of data
     except PermissionError:  # This means that the file is probably open somewhere, it could also be locked.
         print("Is your file open in a different location? Please press a key and try again.")
         input()
